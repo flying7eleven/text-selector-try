@@ -1,0 +1,9 @@
+[package]
+name = "text-selector-try"
+version = "0.1.0"
+authors = ["Tim Hütz <tim+github@janke.biz>"]
+edition = "2018"
+
+[dependencies]
+reqwest = "0.10"
+select = "0.4"
