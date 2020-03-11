@@ -10,7 +10,9 @@ fn main() {
         .unwrap();
 
     Document::from(res.as_str())
-        .find(Name("a"))
-        .filter_map(|n| n.attr("href"))
+        .find(Name("span"))
+        .filter(|n| n.attr("class").is_some())
+        .filter(|n| n.attr("class").unwrap() == "stand")
+        .map(|n| n.as_text().unwrap())
         .for_each(|x| println!("{}", x));
 }
