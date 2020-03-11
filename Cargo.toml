@@ -5,5 +5,5 @@ authors = ["Tim Hütz <tim+github@janke.biz>"]
 edition = "2018"
 
 [dependencies]
-reqwest = "0.10"
+reqwest = { version = "0.10", features = ["blocking"] }
 select = "0.4"
