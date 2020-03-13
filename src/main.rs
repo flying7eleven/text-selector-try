@@ -1,7 +1,7 @@
 use select::document::Document;
 use select::predicate::Name;
 
-static EXAMPLE_PAGE: &str = "https://www.tagesschau.de/ausland/italien-kliniken-101.html";
+static EXAMPLE_PAGE: &str = "https://www.heise.de/security/meldung/Achtung-Sicherheitspatch-gegen-kritische-SMBv3-Luecke-jetzt-verfuegbar-4681993.html";
 
 fn main() {
     let res = reqwest::blocking::get(EXAMPLE_PAGE)
@@ -9,25 +9,39 @@ fn main() {
         .text()
         .unwrap();
 
-    Document::from(res.as_str())
-        .find(Name("span"))
-        .filter(|n| n.attr("class").is_some())
-        .filter(|n| n.attr("class").unwrap().contains("stand"))
-        .map(|n| n.inner_html())
-        .for_each(|x| println!("{}", x));
+    let headline = Document::from(res.as_str())
+        .find(Name("h1"))
+        .filter(|n| n.attr("itemprop").is_some())
+        .filter(|n| n.attr("itemprop").unwrap().contains("headline"))
+        .map(|n| n.inner_html().trim().to_string())
+        .last()
+        .unwrap();
 
-    Document::from(res.as_str())
-        .find(Name("p"))
-        .filter(|n| n.attr("class").is_some())
-        .filter(|n| n.attr("class").unwrap().contains("autorenzeile"))
-        .map(|n| n.inner_html())
-        .for_each(|x| println!("{}", x));
+    let author = Document::from(res.as_str())
+        .find(Name("li"))
+        .filter(|n| n.attr("itemprop").is_some())
+        .filter(|n| n.attr("itemprop").unwrap().contains("author"))
+        .map(|n| n.inner_html().trim().to_string())
+        .last()
+        .unwrap();
 
+    let published = Document::from(res.as_str())
+        .find(Name("time"))
+        .filter(|n| n.attr("datetime").is_some())
+        .map(|n| n.attr("datetime").unwrap().to_string())
+        .last()
+        .unwrap();
 
-    Document::from(res.as_str())
-        .find(Name("p"))
+    let article = Document::from(res.as_str())
+        .find(Name("div"))
         .filter(|n| n.attr("class").is_some())
-        .filter(|n| n.attr("class").unwrap().contains("autorenzeile"))
-        .map(|n| n.inner_html())
-        .for_each(|x| println!("{}", x));
+        .filter(|n| n.attr("class").unwrap().contains("article-content"))
+        .map(|n| n.inner_html().trim().to_string())
+        .last()
+        .unwrap();
+
+    println!("Headline: {}", headline);
+    println!("Author: {}", author);
+    println!("Published: {}", published);
+    println!("Article text: {}", article);
 }
